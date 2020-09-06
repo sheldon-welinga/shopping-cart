@@ -87,6 +87,7 @@ body {
   background: var(--primaryColor);
   color: var(--mainBlack);
   border: 1px solid var(--primaryColor);
+  outline: none;
   transition: var(--mainTransition);
   cursor: pointer;
 }
