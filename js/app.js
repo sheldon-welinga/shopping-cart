@@ -201,9 +201,7 @@ class UI {
 
     const btn = this.getSingleButton(id);
     btn.disabled = false;
-    btn.innerHTML = `
-    <i class="fa fa-shopping-cart"></i> add to cart
-    `;
+    btn.innerHTML = `<i class="fa fa-shopping-cart"></i> add to cart`;
   }
 
   //clear the entire cart to default nothing
@@ -243,6 +241,72 @@ class UI {
   cartLogic() {
     //clear cart items using the clear cart button
     clearCartBtn.addEventListener("click", () => this.clearCart());
+
+    //cart functionality for removeItem, increase item(arrow up) or decrease item (arrow down)
+    cartContent.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-item")) {
+        /**
+         * @param itemId - The id of the dataset value for the item i.e. data-id
+         * @param cartItem - The parent element that the button is located in
+         */
+
+        const itemId = e.target.dataset.id;
+        // removes item from the cart
+        this.removeItem(itemId);
+
+        //remove item from the DOM
+        const cartItem = e.target.parentElement.parentElement;
+        cartContent.removeChild(cartItem);
+      }
+
+      if (e.target.classList.contains("fa-chevron-up")) {
+        /**
+         * @param addItemCountId - The id of the dataset value for the item i.e. data-id
+         * @param tempItem - The found element containing the id
+         */
+
+        const addItemCountId = e.target.dataset.id;
+        let tempItem = cart.find((item) => item.id === addItemCountId);
+
+        //increment the tempItem count
+        tempItem.itemTotalCount += 1;
+
+        //Save the  cart item in the local storage
+        Storage.saveCart(cart);
+
+        //update the cart values
+        this.setCartValues(cart);
+
+        //update the actual value of the count
+        e.target.nextElementSibling.innerText = tempItem.itemTotalCount;
+      }
+
+      if (e.target.classList.contains("fa-chevron-down")) {
+        /**
+         * @param lowerItemCountId - The id of the dataset value for the item i.e. data-id
+         * @param tempItem - The found element containing the id
+         * @param cartItem - The parent element that the button is located in
+         */
+
+        const lowerItemCountId = e.target.dataset.id;
+        const cartItem = e.target.parentElement.parentElement;
+        let tempItem = cart.find((item) => item.id === lowerItemCountId);
+
+        //decrease the tempItem count
+        tempItem.itemTotalCount -= 1;
+
+        // check if the count is less than 0 and remove from the dom and storage
+        if (tempItem.itemTotalCount <= 0) {
+          cartContent.removeChild(cartItem);
+          this.removeItem(lowerItemCountId);
+        }
+
+        //else reduce the count of the item and save it in the localStorage
+        Storage.saveCart(cart);
+        this.setCartValues(cart);
+        e.target.previousElementSibling.innerText = tempItem.itemTotalCount;
+      }
+    });
   }
 }
 
